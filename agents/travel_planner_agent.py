@@ -5,31 +5,33 @@ class TravelPlannerAgent:
     def __init__(self):
         self.name = "Travel Itinerary Planner"
 
-    def generate_itinerary(self, location: str, days: int, interests: list):
-        prompt = f"""
-        You are a travel planning assistant. 
-        Plan a {days}-day itinerary of the trip for {location} based on these interests: {interests}.
-        Give a day-wise itinerary in paragraphs with approximate times at each location.
-        Return the itinerary as a JSON object where keys are "day_1", "day_2", ..., "day_{days}" 
-        and values are paragraphs describing the full day, including places to visit, timing, 
-        and activities. Example:
-        {{
-            "day_1": "Morning: Visit Louvre Museum (2 hours), Afternoon: Walk around Notre Dame Cathedral (1 hour), Evening: Dinner at local cafe",
-            "day_2": "..."
-        }}
-        Ensure the JSON is valid.
+    def generate_and_curate_itinerary(self, location: str, days: int, interests: list, style: str = "engaging, descriptive, friendly"):
         """
+        Single function that:
+        1️⃣ Generates multi-day itinerary in paragraphs (1 call)
+        2️⃣ Enhances the full itinerary in one pass (1 call)
+        Total API calls: 2
+        """
+        # 1.Generate full itinerary
+        generate_prompt = f"""
+        You are a travel planner.
+        Plan a {days}-day trip for {location} based on these interests: {interests}.
+        Write the full itinerary as paragraphs for each day, including approximate times and activities.
+        Each day should start with "Day X:" followed by a descriptive paragraph.
+        Return plain text, no JSON or lists.
+        """
+        raw_itinerary = run_llm(generate_prompt)
 
-        response = run_llm(prompt)
+        # # 22.Curate / enhance in one go
+        # enhance_prompt = f"""
+        # You are a professional travel content writer.
+        # Enhance the following itinerary in a {style} style.
+        # Keep all activities, timings, and places, but make it more engaging, smooth, and readable.
 
-        # Safe parsing
-        try:
-            itinerary = json.loads(response)
-        except json.JSONDecodeError:
-            # Fallback: parse as lines if GPT fails to return JSON
-            lines = [line.strip() for line in response.split("\n") if line.strip()]
-            itinerary = {f"day_{i+1}": lines[i] if i < len(lines) else "" for i in range(days)}
+        # Itinerary:
+        # {raw_itinerary}
+        # """
+        # curated_itinerary = run_llm(enhance_prompt)
 
-        return itinerary
-    
+        return raw_itinerary
     

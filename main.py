@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from agents.travel_planner_agent import TravelPlannerAgent
 from agents.content_curator_agent import ContentCuratorAgent
 from backend.database import init_db, save_session
-from backend.schemas import TravelRequest, TravelResponse
+from backend.schemas import TravelRequest, TravelResponse, TravelResponsePara
 
 #add path to parent folder [only testing purpose]
 # sys.path.append(str(Path(__file__).resolve().parent))
@@ -76,23 +76,24 @@ init_db()
 #      ↓
 # Response Returned
 
-# generate itinerary, given schema
-@app.post("/generate_itinerary", response_model=TravelRequest) 
+# generate itinerary, given schema of response type
+@app.post("/generate_itinerary", response_model=TravelResponsePara) 
 
 #async allows - concurrent users requests to not block; scalable APIs
 #parameter injection to FASTAPI call; POST sends request to server
 async def generate_itinerary(request: TravelRequest):
     # Travel Planner generates itinerary
-    itinerary = planner_agent.generate_itinerary(
+    final_itinerary = planner_agent.generate_and_curate_itinerary(
         location=request.location,
         days=request.days,
         interests=request.interests
     )
 
     # Content Curator generates content for each day
-    content = curator_agent.generate_content(itinerary) #A2A communication: Planner -> curator
+    # content = curator_agent.curate_full_itinerary(itinerary) #A2A communication: Planner -> curator
 
     # Save session in DB
-    save_session(request.model_dump(), itinerary, content) # db can't store class objects, so convert to dict
+    # save_session(request.model_dump(), itinerary, content) # db can't store class objects, so convert to dict
 
-    return {"itinerary": itinerary, "content": content} #fastAPI converts to JSON - instead of calling json.dumps()
+    # return {"itinerary": itinerary, "content": content} #fastAPI converts to JSON - instead of calling json.dumps()
+    return {"itinerary":final_itinerary}

@@ -11,5 +11,8 @@ class TravelRequest(BaseModel):
     interests: List[str]
 
 class TravelResponse(BaseModel):
-    itinerary: Dict[str, list]
-    content: Dict[str, str]
+    itinerary: Dict[str, List[str]]
+    content: Dict[str, List[str]]
+
+class TravelResponsePara(BaseModel):
+    itinerary: str
