@@ -8,7 +8,7 @@ A multi-agent AI system to plan travel itineraries and generate engaging content
 3. Multi-Agent Workflow: Planner → Curator (A2A communication).
 4. Front-end Dashboard: Built with Streamlit to interact with the agents.
 5. Database Persistence: Stores user requests and generated itineraries.
-6. FastAPI backend with OpenAPI docs (/docs).
+6. FastAPI backend.
 
 **Tech Stack:**
 - Python 3.10+
