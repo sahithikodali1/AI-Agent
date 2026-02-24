@@ -27,10 +27,11 @@ class ContentCuratorAgent:
     def curate_full_itinerary(self, itinerary_json: dict, style: str = "engaging, descriptive, friendly"):
         """
         Enhance the entire itinerary day-wise.
-        Args: itinerary_json (dict): {"day_1": "...", "day_2": "...", ...}
-        Returns: dict: {"day_1": enhanced_text, "day_2": enhanced_text, ...}
+        Args: itinerary_json (dict): {"day_1": [para1, para2, ..], "day_2": [..], ...}
+        Returns: dict: {"day_1": [enhanced_para1, enhanced_para2, ..], "day_2": [..], ...}
         """
         curated_itinerary = {}
-        for day, paragraph in itinerary_json.items():
-            curated_itinerary[day] = self.generate_content(paragraph, style)
+        for day, paras in itinerary_json.items():
+            enhanced_paras = [self.generate_content(p, style) for p in paras]
+            curated_itinerary[day] = enhanced_paras
         return curated_itinerary
